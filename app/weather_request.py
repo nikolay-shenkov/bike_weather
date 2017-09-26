@@ -3,7 +3,7 @@ import time
 import requests
 from requests.exceptions import ConnectionError, Timeout
 
-# api settings
+# api parameters
 COUNTRY = 'canada'
 CITY = 'vancouver'
 
@@ -15,6 +15,16 @@ REQUEST_URL = TEMPLATE.format(API_KEY, COUNTRY, CITY)
 
 
 def get_days_with_scores():
+    """Sends a request to the Weather Underground API for a four day 
+    forecast and produces a bike-weather score for each day.
+
+    Returns:
+        result: dict of the form {day_stamp: score} for each of the four
+                days in the forecast. Example output:
+                {'Mon, Sep 25, 2017': 32, 'Thu, Sep 28, 2017': 72, 
+                 'Tue, Sep 26, 2017': 45, 'Wed, Sep 27, 2017': 55}
+    """
+
     four_day = send_request()
     if four_day is not None:
         result = {}
