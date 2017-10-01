@@ -1,20 +1,25 @@
 import time
 
 import requests
+import requests_toolbelt.adapters.appengine
 from requests.exceptions import ConnectionError, Timeout
+
+# Use the App Engine Requests adapter. This makes sure that Requests uses
+# URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
 
 # api parameters
 COUNTRY = 'canada'
 CITY = 'vancouver'
 
-with open('../secret.txt', 'r') as f:
+with open('secret.txt', 'r') as f:
     API_KEY = f.read().strip()
 
 TEMPLATE = 'http://api.wunderground.com/api/{}/forecast/q/{}/{}.json'
 REQUEST_URL = TEMPLATE.format(API_KEY, COUNTRY, CITY)
 
 
-def get_days_with_scores():
+def get_weather_scores():
     """Sends a request to the Weather Underground API for a four day 
     forecast and produces a bike-weather score for each day.
 
@@ -27,12 +32,17 @@ def get_days_with_scores():
 
     four_day = send_request()
     if four_day is not None:
-        result = {}
+        result = []
         for daily in four_day:
-            time_label = extract_time_label(daily)
+            time_label, weekday = extract_time_label(daily)
             features = compute_features(daily)
             raw_score = compute_raw_score(features)
-            result[time_label] = compute_final_score(raw_score)
+            final_score = compute_final_score(raw_score)
+            result.append({
+                "weekday": weekday,
+                "date": time_label,
+                "score": final_score,
+            })
         return result
 
 
@@ -70,9 +80,11 @@ def extract_time_label(daily):
     """The formatted time label is in the form: 
     'Mon, Nov 3, 2017' (it is not fixed width)
     """
-    time_fields = ['weekday_short', 'monthname_short', 'day', 'year']
+    weekday = daily['date']['weekday']
+    time_fields = ['monthname_short', 'day', 'year']
     values = [daily['date'][field] for field in time_fields]
-    return '{}, {} {}, {}'.format(*values)
+    time_label =  '{} {}, {}'.format(*values)
+    return time_label, weekday
 
 
 def compute_features(daily):
