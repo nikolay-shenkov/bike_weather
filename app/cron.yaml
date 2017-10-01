@@ -1,0 +1,4 @@
+cron:
+- description: query weather api
+  url: /tasks/query_weather
+  schedule: every 4 hours

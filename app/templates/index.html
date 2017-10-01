@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="static/styles.css">
+    
+    <title>Bike Weather Recommendations</title>
+  </head>
+
+  <body>
+    <div class="container-fluid" id="main-container">
+      <h1 id='main-title'>Bike weather recommendations</h1>
+
+      {% if empty_scores %}
+      <div id="something-wrong">Looks like something went wrong with fetching the weather data. Try again later.</div>
+      
+      {% else %}
+
+      <div class="card-deck-wrapper">
+      <div class="card-deck">
+        {% for daily in weather_scores %}
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">{{ daily.weekday }}</h4>
+              <p class="lead date-label">{{ daily.date }}</p>
+              <p class="card-text card-p">
+                <span class="score-perc">{{ daily.score }}%</span> 
+                <span class="info-tip" data-toggle="tooltip" data-placement="top" title="Higher score means better weather conditions for biking.">?</span>
+
+              <div class="progress">
+                <div {% if daily.score > 50 %}
+                     class="progress-bar bg-success"
+                     {% elif daily.score > 20 %}
+                     class="progress-bar bg-warning"
+                     {% else %}
+                     class="progress-bar bg-danger"
+                     {% endif %}
+                role="progressbar" style="width: {{ daily.score }}%" aria-valuenow="{{ daily.score }}" aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <br>
+    
+    <div>This app uses a machine learning model to predict if the weather conditions in the next few days are suitable for biking in the city of Vancouver, BC, Canada. It takes into account air temperature, humidity, wind speed and other weather-related variables to calculate a weather score.
+    </div>
+
+    <div>This app is in experimental status. The model does not take into account air quality and severe weather alerts when assessing the biking conditions. Always use your best judgement when deciding if it is safe to bike.
+    </div>
+
+    <br>
+    <div class="row">
+      <div class="col-9">
+        The model uses weather forecast data from Weather Underground.
+      </div>
+      <div class="col">
+        <img id="logo-image" src="https://icons.wxug.com/logos/JPG/wundergroundLogo_4c_horz.jpg" alt="Weather Underground Logo">
+      </div>
+    </div>
+
+    {% endif %}
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    
+    <script>
+      // activate all tooltips 
+      $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+      })
+    </script>
+  </body>
+</html>
